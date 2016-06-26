@@ -1,14 +1,14 @@
 name:                matcha
 version:             0.1.0.0
-synopsis:            Initial project template from stack
+synopsis:            language with type inference and macros
 description:         Please see README.md
-homepage:            https://github.com/githubuser/matcha#readme
+homepage:            https://github.com/charlesetc/matcha#readme
 license:             BSD3
 license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2016 Author name here
-category:            Web
+author:              Charles Chamberlain
+maintainer:          charlespipin@gmail.com
+copyright:           2016 Charles Chamberlain
+category:            Language
 build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lib
   build-depends:       base >= 4.7 && < 5
+                     , parsec
   default-language:    Haskell2010
 
 executable matcha
@@ -25,6 +26,7 @@ executable matcha
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , matcha
+                     , parsec
   default-language:    Haskell2010
 
 test-suite matcha-test

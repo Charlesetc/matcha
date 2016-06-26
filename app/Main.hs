@@ -3,4 +3,4 @@ module Main where
 import Lib
 
 main :: IO ()
-main = Lib.pprint $ Lib.run "(hi there)"
+main = putStrLn . show $ Lib.run "{ x : (hi there) ; hi there}"

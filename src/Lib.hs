@@ -1,33 +1,51 @@
 module Lib
     ( run,
-      pprint
     ) where
 
-import Text.ParserCombinators.ReadP as R
+import Text.ParserCombinators.Parsec hiding (newline)
 
-data Token = Left_c
-           | Right_c
-           | Left_r
-           | Right_r
-           deriving Show
+data Tree a = FDef [Tree a] [Tree a]
+          | FApp [Tree a]
+          | Symbol a
+          deriving (Show)
 
--- this is like 'satisfy' but you can control the return value
-satisfy_with :: (Char -> Bool) -> (Char -> a) -> ReadP a
-satisfy_with p a = do c <- get; if p c then return (a c) else pfail
+ignore_after :: Parser a -> (Parser b -> Parser b)
+ignore_after p p' = do
+  r <- p'
+  optional (many $ p)
+  return r
 
--- mappings between char and token
-token_char char token = satisfy_with (== char) (const token)
+spaced :: Parser a -> Parser a
+spaced = ignore_after (char ' ')
 
-parse_tokens = token_char '{' Left_c
-             +++ token_char '}' Right_c
-             +++ token_char '(' Left_r
-             +++ token_char ')' Right_r
+symbol :: Parser (Tree String)
+symbol = spaced (many1 (noneOf ";.:(){} \t\n")) >>= \x -> return (Symbol x)
 
--- turn a readP into a function
-run :: String -> [(Token, String)]
-run = readP_to_S parse_tokens
+newline = spaced $ oneOf ";\n"
 
--- print the output of run
-pprint :: [(Token, String)] -> IO ()
-pprint = foldr print_tuple (putStrLn "") where
-  print_tuple (token, _) acc = acc >> putStrLn (show token)
+schar = spaced . char
+
+-- function definition
+definition = between (schar '{') (schar '}') function where
+
+    function = do
+      a <- function_arguments
+      b <- function_body
+      return $ FDef a b
+
+    line = ignore_after newline (many1 matcha_token >>= \x -> return (FApp x))
+
+    function_arguments = manyTill symbol (schar ':')
+    function_body = many line
+
+-- function application
+application = between (schar '(') (schar ')') (many matcha_token)
+    >>= \x -> return (FApp x)
+
+-- any token
+matcha_token = definition <|> application <|> symbol
+
+-- parse many tokens and eof
+matcha_tokens = many matcha_token >>= \x -> (eof >> return x)
+
+run = parse matcha_tokens "(unknown)"
