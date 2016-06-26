@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import Matcha.Parser as Parser
 
 main :: IO ()
-main = putStrLn . show $ Lib.run "{ x : (hi there) ; hi there}"
+main = putStrLn . show $ Parser.run "{ x : (hi there) ; hi there}"

@@ -1,4 +1,4 @@
-module Lib
+module Matcha.Parser
     ( run,
     ) where
 
@@ -9,7 +9,7 @@ data Tree a
   = FDef [Tree a] [Tree a] -- { [identifier] : [FApp] }
   | FApp [Tree a]          -- ([matcha_token])
   | Symbol a
-  deriving (Show)
+  deriving (Show, Eq)
 
 -- ignores the first parser while keeping the second one.
 ignore_after :: Parser a -> (Parser b -> Parser b)
@@ -26,6 +26,9 @@ symbol = spaced (many1 (noneOf ";.:(){} \t\n")) >>= \x -> return (Symbol x)
 
 newline :: Parser Char
 newline = spaced $ oneOf ";\n"
+
+dot :: Parser (Tree String)
+dot = char '.' >>= \x -> return (Symbol ".")
 
 schar :: Char -> Parser Char
 schar = spaced . char
@@ -51,7 +54,7 @@ application = between (schar '(') (schar ')') (many matcha_token)
 
 -- any token
 matcha_token :: Parser (Tree String)
-matcha_token = definition <|> application <|> symbol
+matcha_token = definition <|> application <|> symbol <|> dot
 
 -- parse many tokens and eof
 matcha_tokens :: Parser [Tree String]
