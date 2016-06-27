@@ -34,9 +34,12 @@ main = hspec $ do
       it "parses nested function definition" $ do
         assert_parses "{: {x:}}" "[FDef [] [FApp [FDef [Symbol \"x\"] []]]]"
 
+      it "semicolons work fine" $ do
+        assert_parses "{: a; b}" "[FDef [] [FApp [Symbol \"a\"],FApp [Symbol \"b\"]]]"
+
       it "does not parse mismatched brackets" $ do
         assert_fails "{" 1 2 "end of input"
-        assert_fails "a\n}" 2 1 "unexpected '}"
+        assert_fails "a\n}" 2 1 "unexpected \"}"
 
       it "fails on non-symbols for function arguments" $ do
         assert_fails "{ () : }" 1 3 "unexpected \"("
@@ -54,4 +57,4 @@ main = hspec $ do
 
       it "does not parse mismatched parens" $ do
         assert_fails "(" 1 2 "end of input"
-        assert_fails "a\n)" 2 1 "unexpected ')"
+        assert_fails "a\n)" 2 1 "unexpected \")"
