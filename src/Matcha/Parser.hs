@@ -19,7 +19,7 @@ ignore_after p p' = do
   return r
 
 spaced :: Parser a -> Parser a
-spaced = ignore_after (char ' ')
+spaced = ignore_after (char ' ' <|> newline)
 
 symbol :: Parser (Tree String)
 symbol = spaced (many1 (noneOf ";.:(){} \t\n")) >>= \x -> return (Symbol x)
