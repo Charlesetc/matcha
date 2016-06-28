@@ -3,7 +3,8 @@ import Matcha.Parser
 import Data.List (isInfixOf)
 
 assert_parses input asserted = runner . run $ input where
-  runner (Right as) = show as `shouldBe` asserted
+  get_trees = map $ maptree fst
+  runner (Right as) = show (get_trees as) `shouldBe` asserted
   runner as = as `shouldBe` Right []
 
 assert_fails input line column message = do
