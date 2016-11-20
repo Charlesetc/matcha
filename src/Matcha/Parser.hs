@@ -1,26 +1,10 @@
 module Matcha.Parser
-    ( run,
-      maptree,
+    ( run
     ) where
 
 import Text.ParserCombinators.Parsec hiding (newline)
 
-
--- The syntax trees used internally
-data AbstractTree a
-  = FDef [AbstractTree a] [AbstractTree a]
-  | FApp [AbstractTree a]
-  | Symbol a
-  | DotSymbol a
-  deriving (Show, Eq)
-
-type Tree = AbstractTree (String, Position)
-
-maptree :: (a -> b) -> AbstractTree a -> AbstractTree b
-maptree f tree = case tree of
-  FDef a b -> FDef (map (maptree f) a) (map (maptree f) b)
-  FApp a -> FApp (map (maptree f) a)
-  Symbol a -> Symbol (f a)
+import Matcha.AbstractTree
 
 -- ignores the first parser while keeping the second one.
 ignore_after :: Bool -> Parser a -> (Parser b -> Parser b)
@@ -88,9 +72,6 @@ matcha_tokens :: Parser [Tree]
 matcha_tokens = many lined_matcha_token >>= \x -> (eof >> return x)
 
 run = parse matcha_tokens "(unknown)"
-
-data Position = Position { start :: (Int, Int), end :: (Int, Int) }
-                deriving (Show, Eq)
 
 -- get the position of a parser and include it in the return.
 positioned :: Parser a -> Parser (a, Position)
