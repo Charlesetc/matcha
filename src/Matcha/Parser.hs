@@ -11,6 +11,7 @@ data AbstractTree a
   = FDef [AbstractTree a] [AbstractTree a]
   | FApp [AbstractTree a]
   | Symbol a
+  | DotSymbol a
   deriving (Show, Eq)
 
 type Tree = AbstractTree (String, Position)
@@ -37,15 +38,22 @@ twin_lined  = ignore_after True newline
 
 into constructor x = return $ constructor x
 
+-- alphanumber :: Parser String
+alphanumber = many1 . noneOf $ ";.:(){} \t\n"
+
 symbol :: Parser Tree
 symbol = parse_str_symbol >>= into Symbol where
-    parse_str_symbol = positioned . spaced . many1 . noneOf $  ";.:(){} \t\n"
+    parse_str_symbol = positioned . spaced $ alphanumber
 
 newline :: Parser Char
 newline = spaced $ oneOf ";\n"
 
+dot_symbol :: Parser Tree
+dot_symbol = try parse_dot_symbol >>= into DotSymbol where
+  parse_dot_symbol = positioned . spaced $ string "." >> alphanumber
+
 dot :: Parser Tree
-dot = (positioned . string $ ".") >>= into Symbol
+dot = (positioned . spaced $ string ".") >>= into Symbol
 
 schar :: Char -> Parser Char
 schar = spaced . char
@@ -71,7 +79,7 @@ application = lined $ between (schar '(') (schar ')') (many lined_matcha_token)
 
 -- any token
 matcha_token :: Parser Tree
-matcha_token = definition <|> application <|> symbol <|> dot
+matcha_token = definition <|> application <|> symbol <|> dot_symbol <|> dot
 
 lined_matcha_token = (do newline; lined_matcha_token) <|> matcha_token
 
