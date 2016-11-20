@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Matcha.Parser
                      , Matcha.AbstractTree
+                     , Matcha.Operator
                      , Matcha.Dot
   build-depends:       base >= 4.7 && < 5
                      , parsec

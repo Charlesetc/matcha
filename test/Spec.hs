@@ -2,7 +2,16 @@ import Test.Hspec
 import Matcha.Parser
 import Data.List (isInfixOf)
 
+import Matcha.AbstractTree
+
+maptree :: (a -> b) -> AbstractTree a -> AbstractTree b
+maptree f tree = case tree of
+  FDef a b -> FDef (map (maptree f) a) (map (maptree f) b)
+  FApp a -> FApp (map (maptree f) a)
+  Symbol a -> Symbol (f a)
+
 assert_parses input asserted = runner . run $ input where
+  -- this is broken
   get_trees = map $ maptree fst
   runner (Right as) = show (get_trees as) `shouldBe` asserted
   runner as = as `shouldBe` Right []

@@ -1,7 +1,7 @@
 
 module Matcha.Dot
-    ( mapdottree
-    ) where
+  ( maptree
+  ) where
 
 import Matcha.AbstractTree
 
@@ -20,8 +20,8 @@ import Matcha.AbstractTree
 
  --}
 
-mapdottree :: Tree -> Tree
-mapdottree (FApp applist) =  convertapplist applist where
+maptree :: Tree -> Tree
+maptree (FApp applist) =  convertapplist applist where
 
   convertapplist :: [Tree] -> Tree
   convertapplist (first : ((DotSymbol symb) : rest)) =
