@@ -56,6 +56,7 @@ shunting_yard (FApp trees) = FApp . convert_from_postfix $ syard [] [] trees whe
       _ | tree_is_operator t -> error "Binary operator with only one argument"
       _ -> (t : new_trees)
 
+  -- feel free to pretend syard stands for 'scotland yard'
   syard :: [Tree] -> [Tree] -> [Tree] -> [Tree]
   syard operators output [] = operators ++ output
   syard [] output (t : trees) = if tree_is_operator t
