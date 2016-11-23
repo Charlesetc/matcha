@@ -20,9 +20,8 @@ import Matcha.AbstractTree
 
  --}
 
-maptree :: Tree -> Tree
-maptree (FApp applist) =  convertapplist applist where
-
+convert_dot_syntax :: Tree -> Tree
+convert_dot_syntax (FApp applist) =  convertapplist applist where
   convertapplist :: [Tree] -> Tree
   convertapplist (first : ((DotSymbol symb) : rest)) =
     MethodCall symb first rest
@@ -33,4 +32,6 @@ maptree (FApp applist) =  convertapplist applist where
     MethodCall symb first [] : convertinnerlist rest
   convertinnerlist (first : rest) = first : convertinnerlist rest
 
-mapdottree other = other
+convert_dot_syntax other = other
+
+maptree = maptree' convert_dot_syntax
